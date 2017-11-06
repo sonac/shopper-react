@@ -25,7 +25,7 @@ abstract class Users
   object userName extends StringColumn(this)
 
   def addUser(user: User): Future[ResultSet] = {
-    insert.value(_.id, user.userName)
+    insert.value(_.id, user.id)
       .value(_.userName, user.userName)
       .future()
   }
