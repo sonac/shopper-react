@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
   "com.outworkers" %% "phantom-dsl" % "2.12.1",
   "com.outworkers" %% "phantom-streams" % "2.12.1",
   "com.outworkers" %% "util-testing" % "0.30.1",
-  "org.scalatest" %% "scalatest" % "3.0.4" % "test")
+  "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+  "org.scala-lang" % "scala-compiler" % "2.12.3" )
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "sonac.controllers._"
