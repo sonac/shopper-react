@@ -10,6 +10,7 @@ import play.api.mvc._
 import scala.concurrent._
 import com.outworkers.phantom.dsl.context
 import play.api.libs.json.Json
+import workers.GetWords
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -31,6 +32,19 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def getAllSkills = Action.async { implicit request: Request[AnyContent] =>
     val skills = ShopperDatabase.craftSkills.getAllSkills
     skills.map(s => Ok(Json.toJson(s)))
+  }
+
+  def saveSkill = Action(parse.json[CraftSkill]) { implicit request =>
+    println(123)
+    val skill = request.body
+    println(skill)
+    ShopperDatabase.craftSkills.addCraftSkill(skill)
+    Ok
+  }
+
+  def getAllWords = Action.async { implicit request =>
+    val words = ShopperDatabase.words.getAllWords
+    words.map(w => Ok(Json.toJson(w)))
   }
 
 }

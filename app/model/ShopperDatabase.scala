@@ -9,6 +9,7 @@ object Defaults {
 
 class ShopperDatabase(val keyspace: CassandraConnection) extends Database[ShopperDatabase](keyspace) {
   object craftSkills extends CraftSkills with Connector
+  object words extends Words with Connector
 }
 
 object ShopperDatabase extends ShopperDatabase(Defaults.connector)

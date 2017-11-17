@@ -3,7 +3,7 @@ package model
 import java.util.UUID
 
 import com.outworkers.phantom.dsl._
-import play.api.libs.json.Json
+import play.api.libs.json._
 
 import scala.concurrent.Future
 

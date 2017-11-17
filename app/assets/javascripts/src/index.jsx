@@ -1,38 +1,20 @@
-import React, { Component } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
+import CraftSkills from './CraftSkills.jsx';
+import CraftForm from './CraftForm.jsx';
+import PopUp from './PopUp.jsx';
 
-class CraftSkills extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      skills: [],
-    };
-  };
-
-  componentDidMount() {
-
-    fetch('/api')
-      .then(response => response.json())
-      .then(data => this.setState({ skills: data }));
-  }
-
-  render() {
-    const { skills } = this.state
-    return (
-      <div>
-        <select>
-        {skills.map(skill =>
-          <option key={skill.id} value={skill.id}>
-            {skill.skillName}
-          </option>
-        )}
-        </select>
-      </div>
-    )
-  };
+function App() {
+  return (
+    <div>
+      <CraftSkills />
+      <CraftForm />
+      <PopUp />
+    </div>
+  )
 }
 
 ReactDOM.render(
-  <CraftSkills />,
+  <App />,
   document.getElementById('root')
 );
