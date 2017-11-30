@@ -13,3 +13,6 @@ GET     /api                        controllers.HomeController.getAllSkills
 POST    /api/skill                  controllers.HomeController.saveSkill
 
 GET     /api/words                  controllers.HomeController.getAllWords
+
+GET     /api/items                  controllers.HomeController.getAllItems
+POST    /api/calc                   controllers.HomeController.calcChances

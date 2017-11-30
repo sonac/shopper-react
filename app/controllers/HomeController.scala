@@ -3,14 +3,14 @@ package controllers
 import javax.inject._
 
 import com.outworkers.phantom.connectors.KeySpace
-import model.{CraftSkill, ShopperDatabase}
+import model._
 import play.api._
 import play.api.mvc._
 
 import scala.concurrent._
 import com.outworkers.phantom.dsl.context
 import play.api.libs.json.Json
-import workers.GetWords
+import workers.{GetItems, GetWords, Calculator}
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -35,7 +35,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
   def saveSkill = Action(parse.json[CraftSkill]) { implicit request =>
-    println(123)
     val skill = request.body
     println(skill)
     ShopperDatabase.craftSkills.addCraftSkill(skill)
@@ -45,6 +44,17 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def getAllWords = Action.async { implicit request =>
     val words = ShopperDatabase.words.getAllWords
     words.map(w => Ok(Json.toJson(w)))
+  }
+
+  def getAllItems = Action.async { implicit request =>
+    val items = ShopperDatabase.items.getAllItems
+    items.map(i => Ok(Json.toJson(i)))
+  }
+
+  def calcChances = Action(parse.json) { implicit request =>
+    val item = request.body
+    println(item)
+    Ok
   }
 
 }

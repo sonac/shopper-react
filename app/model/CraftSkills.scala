@@ -11,11 +11,12 @@ case class CraftSkill(skillName: String, id: UUID = UUID.randomUUID)
 
 
 object CraftSkill {
-  implicit val craftSkillReads = Json.reads[CraftSkill]
 
+  implicit val craftSkillReads = Json.reads[CraftSkill]
   implicit val craftSkillWrites = Json.writes[CraftSkill]
 
   def fromSkill(e: CraftSkill): CraftSkill = CraftSkill(e.skillName, e.id)
+
 }
 
 abstract class CraftSkills
