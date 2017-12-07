@@ -9,8 +9,11 @@ import play.api.mvc._
 
 import scala.concurrent._
 import com.outworkers.phantom.dsl.context
-import play.api.libs.json.Json
-import workers.{GetItems, GetWords, Calculator}
+import play.api.libs.json.{JsArray, JsValue, Json}
+import workers.{Calculator, GetItems, GetWords, RevCalc}
+
+import scala.collection.immutable
+import scala.util._
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -52,8 +55,18 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
   def calcChances = Action(parse.json) { implicit request =>
-    val item = request.body
-    println(item)
+    val items: JsValue = request.body
+    val vals = (items \ "items").as[Map[String, String]]
+    val serItems: Map[String, Future[Seq[Item]]] = vals.mapValues(x => ShopperDatabase.items.getByName(x))
+    val x: Future[Iterable[Seq[Item]]] = Future.sequence(serItems.values)
+    val calcVals = x.map(it => it.map { s => (s.head.itemName, s.head.itemLvl) -> "Common"}.toMap)
+    calcVals.onComplete{
+      case Success(s) => println(s)
+    }
+    val z: Future[Calculator] = calcVals.map(x => Calculator(x))
+    z.onComplete{
+      case Success(s) => println(s.fusChances)
+    }
     Ok
   }
 

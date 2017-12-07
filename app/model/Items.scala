@@ -35,4 +35,12 @@ abstract class Items
 
   def getAllItems: Future[Seq[Item]] = select.fetch()
 
+  def getByName(itemName: String): Future[Seq[Item]] = {
+    select.where(_.itemName is itemName).allowFiltering().fetch()
+  }
+
+  def getByLevel(itemLvl: Int): Future[Seq[Item]] = {
+    select.where(_.itemLvl is itemLvl).allowFiltering().fetch()
+  }
+
 }
