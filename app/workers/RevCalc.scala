@@ -18,7 +18,15 @@ case class RevCalc(desItem: (Item, String)) {
     "Great" -> 3,
     "Flawless" -> 4,
     "Epic" -> 5,
-    "Legendary" -> 6)
+    "Legendary" -> 6
+  )
+
+  val rankedQuals: Map[Int, String] = qualCoefs.map{case (k, v) => (v, k)}
+
+  val validQuals: Iterable[String] = {
+    val mLvl = qualCoefs(desItem._2) - 1
+    rankedQuals.filter{ case (k, v) => k >= mLvl}.values
+  }
 
   val dstnctLvls: Future[Seq[Int]] = ShopperDatabase.items.getAllItems.map(x => x.map(it => it.itemLvl).distinct)
 
@@ -35,13 +43,33 @@ case class RevCalc(desItem: (Item, String)) {
   }
 
   val allCombs: Future[Seq[((String, Int), String)]] = {
-    val quals: Seq[String] = qualCoefs.keys.toSeq
+    val quals: Seq[String] = rankedQuals.filter(p => p._1 < 5).values.toSeq
     val combs: Future[Seq[((String, Int), String)]] = {
       dummyItems.map(seq => seq.flatMap(it => quals.map(q => (it.itemName, it.itemLvl) -> q)))
     }
     combs
   }
 
+  lazy val all2Combs: Future[Seq[Seq[((String, Int), String)]]] = {
+    allCombs.map(seq => seq.combinations(2).toSeq.filter(comb => {
+      comb.exists(p => validQuals.toSeq.contains(p._2)) && comb.exists(p => p._1._2 == desItem._1.itemLvl)
+    }))
+  }
 
+  lazy val all3Combs: Future[Seq[Seq[((String, Int), String)]]] = {
+    allCombs.map(seq => seq.combinations(3).toSeq.filter(comb => comb.exists(p => validQuals.toSeq.contains(p._2))))
+  }
+
+  lazy val all4Combs: Future[Seq[Seq[((String, Int), String)]]] = {
+    allCombs.map(seq => seq.combinations(4).toSeq.filter(comb => comb.exists(p => validQuals.toSeq.contains(p._2))))
+  }
+
+  lazy val all5Combs: Future[Seq[Seq[((String, Int), String)]]] = {
+    allCombs.map(seq => seq.combinations(5).toSeq.filter(comb => comb.exists(p => validQuals.toSeq.contains(p._2))))
+  }
+
+  lazy val all2Fuses: Future[Seq[Seq[((String, String), Double)]]] = {
+    all2Combs.map(seq => seq.map(s => Calculator(s.toMap).fusChances))
+  }
 
 }
