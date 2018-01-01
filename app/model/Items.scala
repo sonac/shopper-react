@@ -24,6 +24,7 @@ abstract class Items
 
   object itemName extends StringColumn(this)
   object itemLvl extends IntColumn(this)
+  object itemPrice extends IntColumn(this)
   object id extends UUIDColumn(this) with PartitionKey
 
   def addItem(item: Item): Future[ResultSet] = {

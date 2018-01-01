@@ -1,33 +1,46 @@
 package workers
 
-import model.{ShopperDatabase, Item}
+import model._
 
 import scala.io.Source
 import java.util.UUID
 
+import slick.jdbc.JdbcBackend.Database
+import slick.jdbc.PostgresProfile.api._
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
+
 case class GetItems(filename: String) {
 
-  private def putItem(item: (String, Int)): Unit = {
-    ShopperDatabase.items.addItem(Item(item._1, item._2, UUID.randomUUID))
+
+
+  private def putItems(inp: Seq[ShopItem]): Unit = {
+
+    val db = Database.forConfig("shopperDb")
+    val items = TableQuery[ShopItems]
+    items.schema.create
+    val newItems: Seq[(String, Int, Int)] = inp.map(i => (i.itemName, i.itemLvl, i.itemPrice))
+    val ins_action = items ++= newItems
+    Await.result(
+      db.run(ins_action),
+      Duration.Inf
+    )
+
   }
 
-  private def getItem(line: String): (String, Int) = {
-    val splittedLine = line.split("\\t").toList
-    (splittedLine.head, splittedLine.tail.head.toInt)
-  }
-
-  private def loadItems(items: List[String]): Unit = items match {
-    case Nil => throw new NoSuchElementException("You've entered empty file")
-    case x :: Nil => putItem(getItem(x))
+  private def getItems(line: List[String], acc: Seq[ShopItem])(ins: Seq[ShopItem] => Unit): Unit = line match {
+    case Nil => ins(acc)
     case x :: xs => {
-      putItem(getItem(x))
-      loadItems(xs)
+      val splittedLine = x.split("\\t").toList
+      getItems(xs, acc :+ ShopItem(splittedLine.head, splittedLine.tail.head.toInt, splittedLine.tail.tail.head.toInt))(ins)
     }
   }
 
   def parse: Unit = {
     val items = Source.fromFile(filename, "iso-8859-1").mkString.replace("\"", "").split("\\r?\\n").toList
-    loadItems(items)
+    getItems(items, Nil)(putItems)
   }
 
 }

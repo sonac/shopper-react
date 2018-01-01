@@ -31,7 +31,7 @@ class RevCalcSpec extends AsyncFlatSpec {
   }
 
   "All combos " should " contain dummy item" in {
-    revCalc.flatMap(s => s.allCombs.flatMap(seq => assert(seq.contains(("Dummy Item 43", 43) -> "Common"))))
+    revCalc.flatMap(s => s.allCombs.flatMap(seq => assert(seq.contains(("Dummy Item 43", 43, "Common")))))
   }
 
   "All combos " should " have length 36" in {
@@ -39,7 +39,7 @@ class RevCalcSpec extends AsyncFlatSpec {
   }
 
   "All 2 combos " should " have length 279" in {
-    revCalc.flatMap(s => s.all2Combs.flatMap(seq => assert(seq.length == 279)))
+    revCalc.flatMap(s => s.all2Combs.flatMap(seq => assert(seq.length == 59)))
   }
 
   "All 3 combos " should " have length 4215" in {
@@ -55,7 +55,12 @@ class RevCalcSpec extends AsyncFlatSpec {
   }
 
   "Check that 2 fuses " should " return smth" in {
-    revCalc.flatMap(s => s.all2Fuses.flatMap(seq => assert(seq.length == 1)))
+    revCalc.flatMap(s => s.all2Fuses.flatMap(seq => assert(seq.length == 59)))
   }
+
+  "Top fuses " should " be not empty" in {
+    revCalc.flatMap(s => s.top2Fuses.flatMap(seq => assert(seq.isEmpty)))
+  }
+
 
 }

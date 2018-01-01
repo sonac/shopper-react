@@ -6,6 +6,7 @@ import com.outworkers.phantom.connectors.KeySpace
 import model._
 import play.api._
 import play.api.mvc._
+import slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent._
 import com.outworkers.phantom.dsl.context
@@ -29,6 +30,8 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   ShopperDatabase.create()
 
   def index() = Action { implicit request: Request[AnyContent] =>
+    val db = Database.forConfig("shopperDb")
+    //GetItems("/Users/asumko/git/dumb_react/src.txt").parse
     Ok(views.html.index())
   }
 
@@ -55,11 +58,12 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
   def calcChances = Action(parse.json) { implicit request =>
+    GetItems("/Users/asumko/git/dumb_react/src.txt").parse
     val items: JsValue = request.body
     val vals = (items \ "items").as[Map[String, String]]
     val serItems: Map[String, Future[Seq[Item]]] = vals.mapValues(x => ShopperDatabase.items.getByName(x))
     val x: Future[Iterable[Seq[Item]]] = Future.sequence(serItems.values)
-    val calcVals = x.map(it => it.map { s => (s.head.itemName, s.head.itemLvl) -> "Common"}.toMap)
+    val calcVals: Future[Seq[(String, Int, String)]] = x.map(it => it.map { s => (s.head.itemName, s.head.itemLvl,  "Common")}.toSeq)
     calcVals.onComplete{
       case Success(s) => println(s)
     }
